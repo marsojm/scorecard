@@ -23,10 +23,16 @@ type alias Model =
        players : List Player
     }
 
+type alias ThrowResult = 
+    { holeId : Int,
+      throws : Int
+    }
+
 type alias Player = 
     {
         id : Int,
-        name : String
+        name : String,
+        results : List ThrowResult
     }
 
 type alias Course =
@@ -65,7 +71,7 @@ initModel =
         error = Nothing,
         gameView = True,
         players = [
-            Player 1 "James"
+            Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
         ]
     }
 
@@ -196,7 +202,14 @@ scores player holes =
 
 scoreCell : Player -> Hole -> Html Msg
 scoreCell player hole =
-    td [] [ text "-" ]
+    let throwResult = List.head (List.filter (\tr -> tr.holeId == hole.order) player.results)
+    in 
+        case throwResult of
+            Just x
+                -> td [] [ text (toString x.throws) ]
+            Nothing 
+                -> td [] [text "-"] 
+    
 
 {-
     Create course view

@@ -122,10 +122,22 @@ createCourseHeader =
 createCourseForm : Model -> Html Msg
 createCourseForm model =
     Html.form [ class "form-horizontal" ]
-        [ courseName model
+        [ formErrors model
+        , courseName model
         , addHoleForm model
         , showHoles model 
         ]
+
+formErrors : Model -> Html Msg
+formErrors model =
+    case model.parError of
+        Just err
+            -> div [class "alert alert-danger" ] 
+                   [ 
+                    p [] [ text err ]
+                   ]
+        _ -> div [] []
+    
 
 addHoleForm : Model -> Html Msg
 addHoleForm model =
@@ -166,13 +178,7 @@ showHoles model =
 
 renderHole : Hole -> Html Msg
 renderHole hole =
-    li [] 
-       [ div [ class "form-group" ]
-             [
-                label [ ] [ text ("Hole #" ++ (toString hole.order ) ++ ", par ") ]
-             ,  input [ type' "number", value (toString hole.par) ] []
-             ]
-       ]
+    li [] [ text ("Hole #" ++ (toString hole.order ) ++ ", par " ++ (toString hole.par)) ]
 
 main : Program Never
 main =

@@ -16,7 +16,7 @@ parForHoleDefault = "3"
 type alias Model =
     {  course : Maybe Course,
        nameCandidate : String,
-       holesToAdd : List Hole,
+       holes : List Hole,
        parForHole : String,
        error : Maybe String,
        gameView : Bool
@@ -34,15 +34,29 @@ type alias Hole =
         par : Int
     }
 
-initModel : Model
+{-initModel : Model
 initModel = 
     {
         course = Nothing,
         nameCandidate = "",
-        holesToAdd = [],
+        holes = [],
         parForHole = parForHoleDefault,
         error = Nothing,
         gameView = False
+    }
+-}
+initModel : Model
+initModel = 
+    {
+        course = Nothing,
+        nameCandidate = "My Course",
+        holes = [ Hole 1 3
+                , Hole 2 3
+                , Hole 3 4
+                ],
+        parForHole = parForHoleDefault,
+        error = Nothing,
+        gameView = True
     }
 
 {- 
@@ -59,14 +73,12 @@ update msg model =
     case msg of 
         AddHole
             -> updateParHolesToAdd model
-            
-                
         InputCourseName name
             -> { model | nameCandidate = name }
         InputPar input
             -> { model | parForHole = input }
         CreateCourse
-            ->  if (String.length model.nameCandidate) > 0 && (List.length model.holesToAdd > 0) then 
+            ->  if (String.length model.nameCandidate) > 0 && (List.length model.holes > 0) then 
                     { model | gameView = True, error = Nothing }
                 else 
                     { model | error = Just "Course must have a name and at least one hole!" }
@@ -83,13 +95,13 @@ updateParHolesToAdd model =
     case String.toInt model.parForHole of
         Ok val 
             -> if val > 0 then
-                 let oldHoles = model.holesToAdd
+                 let oldHoles = model.holes
                      newHole = Hole (nextIdForHole model) val
                  in
                 { model | 
                   parForHole = parForHoleDefault
                 , error = Nothing
-                , holesToAdd = (newHole :: oldHoles) }
+                , holes = (newHole :: oldHoles) }
                else 
                 { model | error = Just "Par value must be greter than zero!" }
         _ -> 
@@ -116,13 +128,42 @@ renderScorecard : Model -> Html Msg
 renderScorecard model =
     case model.gameView of
         True -> 
-            div [ ] [ text "Course is initialized" ]
+            div [] 
+                [ table [ class "table table-bordered" ] 
+                        [ renderTableHeader model ]
+                ]
         _ ->
             div [ class "row" ] 
                 [ createCourseHeader
                 , createCourseForm model
                 ]
 
+{-
+    Game view
+-}
+
+renderTableHeader : Model -> Html Msg
+renderTableHeader model =
+    thead [] [ renderHoleNumbers model
+             , renderParRow model 
+             ]
+
+renderParRow : Model -> Html Msg
+renderParRow model =
+    model.holes
+    |> List.map (\h -> th [] [ text <| toString h.par ] )
+    |> (\lst -> ((th [] [ text "Players" ]) :: lst) ++ [(th [] [ text "Total" ])] )
+    |> tr [] 
+
+renderHoleNumbers :Model -> Html Msg
+renderHoleNumbers model = 
+    model.holes
+    |> List.map (\h -> th [] [ text <| toString h.order ] )
+    |> (\lst -> ((th [] []) :: lst) ++ [(th [] [])] ) 
+    |> tr []
+{-
+    Create course view
+-}
 createCourseHeader : Html Msg
 createCourseHeader = 
     h2 [] [text "Create a course"]
@@ -162,7 +203,7 @@ addHoleForm model =
 
 nextIdForHole : Model -> Int
 nextIdForHole model = 
-    (List.length model.holesToAdd) + 1
+    (List.length model.holes) + 1
 
 
 courseName : Model -> Html Msg
@@ -176,11 +217,11 @@ courseName model =
 
 showHoles : Model -> Html Msg
 showHoles model =
-    case List.isEmpty model.holesToAdd of 
+    case List.isEmpty model.holes of 
         True -> 
             p [] [ text "No holes yet" ]
         False ->
-            model.holesToAdd
+            model.holes
             |> List.map renderHole
             |> ul []
             

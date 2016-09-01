@@ -79,7 +79,7 @@ update msg model =
             -> { model | parForHole = input }
         CreateCourse
             ->  if (String.length model.nameCandidate) > 0 && (List.length model.holes > 0) then 
-                    { model | gameView = True, error = Nothing }
+                    { model | gameView = True, error = Nothing, holes = List.sortBy .order model.holes  }
                 else 
                     { model | error = Just "Course must have a name and at least one hole!" }
 

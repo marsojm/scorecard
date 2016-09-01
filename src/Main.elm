@@ -19,7 +19,14 @@ type alias Model =
        holes : List Hole,
        parForHole : String,
        error : Maybe String,
-       gameView : Bool
+       gameView : Bool,
+       players : List Player
+    }
+
+type alias Player = 
+    {
+        id : Int,
+        name : String
     }
 
 type alias Course =
@@ -56,7 +63,10 @@ initModel =
                 ],
         parForHole = parForHoleDefault,
         error = Nothing,
-        gameView = True
+        gameView = True,
+        players = [
+            Player 1 "James"
+        ]
     }
 
 {- 
@@ -131,7 +141,9 @@ renderScorecard model =
             div [] 
                 [ div [ class "row" ] [h3 [] [ text ("Course: " ++ model.nameCandidate) ]]
                 , table [ class "table table-bordered" ] 
-                        [ renderTableHeader model ]
+                        [ renderTableHeader model
+                        , renderTableBody model
+                        ]
                 ]
         _ ->
             div [ class "row" ] 
@@ -162,6 +174,37 @@ renderHoleNumbers model =
     |> List.map (\h -> th [] [ text <| toString h.order ] )
     |> (\lst -> ((th [] []) :: lst) ++ [(th [] [])] ) 
     |> tr []
+
+renderTableBody : Model -> Html Msg
+renderTableBody model =
+          renderPlayers model
+          
+renderPlayers : Model -> Html Msg
+renderPlayers model =
+    model.players
+    |> List.map (\p -> renderPlayer model.holes p)
+    |> tbody []
+
+renderPlayer : List Hole -> Player -> Html Msg
+renderPlayer holes player =
+    ( (playerNameCell player) :: (scores player holes) ) 
+    |> List.reverse 
+    |> (\lst -> (td [] [ text "0" ]) :: lst)
+    |> List.reverse 
+    |> tr []   
+     
+playerNameCell : Player -> Html Msg
+playerNameCell player =
+    td [] [text player.name]
+
+scores : Player -> List Hole -> List (Html Msg)
+scores player holes =
+    List.map (\h -> scoreCell player h) holes
+
+scoreCell : Player -> Hole -> Html Msg
+scoreCell player hole =
+    td [] [ text "-" ]
+
 {-
     Create course view
 -}

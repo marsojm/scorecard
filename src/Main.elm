@@ -93,13 +93,6 @@ update msg model =
                 else 
                     { model | error = Just "Course must have a name and at least one hole!" }
 
-parIsValid : String -> Bool
-parIsValid input =
-    case String.toInt input of
-        Ok val 
-            -> True 
-        _   -> False
-
 updateParHolesToAdd : Model -> Model
 updateParHolesToAdd model =
     case String.toInt model.parForHole of

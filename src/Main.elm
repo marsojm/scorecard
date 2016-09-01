@@ -40,6 +40,7 @@ initModel =
 -}
 type Msg =
     AddHole Int
+    | InputCourseName String
 
 update : Msg -> Model -> Model
 update msg model =
@@ -49,6 +50,8 @@ update msg model =
                    newHole = Hole ((List.length model.holesToAdd) + 1) par
                in
                 { model | holesToAdd = (newHole :: oldHoles)  }
+        InputCourseName name
+            -> { model | nameCandidate = name }
 
 {-
     VIEW
@@ -64,6 +67,7 @@ view model =
               [
                 (renderScorecard model)
               ]
+        , p [] [ text (toString model)] -- for dev purposes
         ]
 
 renderScorecard : Model -> Html Msg
@@ -84,15 +88,19 @@ createCourseHeader =
 createCourseForm : Model -> Html Msg
 createCourseForm model =
     Html.form [ class "form-inline" ]
-        [ div [ class "form-group" ]
-              [ label [ for "courseName" ] [ text "Name" ]
-              , input [ type' "text", class "form-control", id "courseNameInput" ] [ text model.nameCandidate ]              
-              ]
+        [ courseName model
         , div [ class "form-group" ] 
               [ button [ class "btn", type' "button", onClick (AddHole 3) ] [ text "Add hole" ]
               ]
         , showHoles model 
         ]
+
+courseName : Model -> Html Msg
+courseName model =
+    div [ class "form-group" ]
+        [ label [ for "courseName" ] [ text "Name" ]
+              , input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]              
+              ]
 
 showHoles : Model -> Html Msg
 showHoles model =

@@ -4,15 +4,21 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.App as App
+import String exposing (toInt)
 
 {-
     MODEL
 -}
 
+parForHoleDefault : String
+parForHoleDefault = "3"
+
 type alias Model =
     {  course : Maybe Course,
        nameCandidate : String,
-       holesToAdd : List Hole
+       holesToAdd : List Hole,
+       parForHole : String,
+       parError : Maybe String
     }
 
 type alias Course =
@@ -32,26 +38,54 @@ initModel =
     {
         course = Nothing,
         nameCandidate = "",
-        holesToAdd = []
+        holesToAdd = [],
+        parForHole = parForHoleDefault,
+        parError = Nothing
     }
 
 {- 
     UPDATE
 -}
 type Msg =
-    AddHole Int
+    AddHole
+    | InputPar String
     | InputCourseName String
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of 
-        AddHole par
-            -> let oldHoles = model.holesToAdd
-                   newHole = Hole ((List.length model.holesToAdd) + 1) par
-               in
-                { model | holesToAdd = (newHole :: oldHoles)  }
+        AddHole
+            -> updateParHolesToAdd model
+            
+                
         InputCourseName name
             -> { model | nameCandidate = name }
+        InputPar input
+            -> { model | parForHole = input } 
+
+parIsValid : String -> Bool
+parIsValid input =
+    case String.toInt input of
+        Ok val 
+            -> True 
+        _   -> False
+
+updateParHolesToAdd : Model -> Model
+updateParHolesToAdd model =
+    case String.toInt model.parForHole of
+        Ok val 
+            -> if val > 0 then
+                 let oldHoles = model.holesToAdd
+                     newHole = Hole (nextIdForHole model) val
+                 in
+                { model | 
+                  parForHole = parForHoleDefault
+                , parError = Nothing
+                , holesToAdd = (newHole :: oldHoles) }
+               else 
+                { model | parError = Just "Par value must be greter than zero!" }
+        _ -> 
+            { model | parError = Just "Par value must be greter than zero!" }
 
 {-
     VIEW
@@ -65,7 +99,7 @@ view model =
               [ h1 [] [ text "Scorecard" ] ]
         , div [ class "row"] 
               [
-                (renderScorecard model)
+                renderScorecard model
               ]
         , p [] [ text (toString model)] -- for dev purposes
         ]
@@ -87,20 +121,37 @@ createCourseHeader =
 
 createCourseForm : Model -> Html Msg
 createCourseForm model =
-    Html.form [ class "form-inline" ]
+    Html.form [ class "form-horizontal" ]
         [ courseName model
-        , div [ class "form-group" ] 
-              [ button [ class "btn", type' "button", onClick (AddHole 3) ] [ text "Add hole" ]
-              ]
+        , addHoleForm model
         , showHoles model 
         ]
+
+addHoleForm : Model -> Html Msg
+addHoleForm model =
+    div [ class "form-group" ] 
+        [ label [ class "control-label col-sm-2" ] [ text ("Hole #" ++ (toString <| nextIdForHole model ) ++ ", Par: ") ]
+        , div [ class "col-sm-3" ] 
+              [ input [ type' "text", class "form-control", onInput InputPar ] [ text model.parForHole ]
+              ] 
+        , button [ class "btn", type' "button", onClick AddHole ] [ text "Add hole" ]
+        ]
+         
+
+
+nextIdForHole : Model -> Int
+nextIdForHole model = 
+    (List.length model.holesToAdd) + 1
+
 
 courseName : Model -> Html Msg
 courseName model =
     div [ class "form-group" ]
-        [ label [ for "courseName" ] [ text "Name" ]
-              , input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]              
-              ]
+        [ label [ class "control-label col-sm-2" ] [ text "Name" ]
+        , div [class "col-sm-3" ] 
+              [ input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]
+              ]               
+        ]
 
 showHoles : Model -> Html Msg
 showHoles model =

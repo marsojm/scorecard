@@ -129,7 +129,8 @@ renderScorecard model =
     case model.gameView of
         True -> 
             div [] 
-                [ table [ class "table table-bordered" ] 
+                [ div [ class "row" ] [h3 [] [ text ("Course: " ++ model.nameCandidate) ]]
+                , table [ class "table table-bordered" ] 
                         [ renderTableHeader model ]
                 ]
         _ ->

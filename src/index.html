@@ -4,14 +4,15 @@
         <meta charset="utf-8">
         <title>Scorecard</title>
         <script src="Main.js"></script>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="bootstrap.min.css">
         <link rel="stylesheet" href="styles.css">
     </head>
     
     <body>
+        <div id="app"></div>
     </body>
-    
     <script>
-        var app = Elm.Main.fullscreen();
+        var app = Elm.Main.embed(document.getElementById("app"));
     </script>
+    
 </html>

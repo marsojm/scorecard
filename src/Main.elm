@@ -18,7 +18,8 @@ type alias Model =
        nameCandidate : String,
        holesToAdd : List Hole,
        parForHole : String,
-       parError : Maybe String
+       error : Maybe String,
+       gameView : Bool
     }
 
 type alias Course =
@@ -40,7 +41,8 @@ initModel =
         nameCandidate = "",
         holesToAdd = [],
         parForHole = parForHoleDefault,
-        parError = Nothing
+        error = Nothing,
+        gameView = False
     }
 
 {- 
@@ -50,6 +52,7 @@ type Msg =
     AddHole
     | InputPar String
     | InputCourseName String
+    | CreateCourse
 
 update : Msg -> Model -> Model
 update msg model =
@@ -61,7 +64,12 @@ update msg model =
         InputCourseName name
             -> { model | nameCandidate = name }
         InputPar input
-            -> { model | parForHole = input } 
+            -> { model | parForHole = input }
+        CreateCourse
+            ->  if (String.length model.nameCandidate) > 0 && (List.length model.holesToAdd > 0) then 
+                    { model | gameView = True, error = Nothing }
+                else 
+                    { model | error = Just "Course must have a name and at least one hole!" }
 
 parIsValid : String -> Bool
 parIsValid input =
@@ -80,12 +88,12 @@ updateParHolesToAdd model =
                  in
                 { model | 
                   parForHole = parForHoleDefault
-                , parError = Nothing
+                , error = Nothing
                 , holesToAdd = (newHole :: oldHoles) }
                else 
-                { model | parError = Just "Par value must be greter than zero!" }
+                { model | error = Just "Par value must be greter than zero!" }
         _ -> 
-            { model | parError = Just "Par value must be greter than zero!" }
+            { model | error = Just "Par value must be greter than zero!" }
 
 {-
     VIEW
@@ -106,10 +114,10 @@ view model =
 
 renderScorecard : Model -> Html Msg
 renderScorecard model =
-    case model.course of
-        Just course -> 
+    case model.gameView of
+        True -> 
             div [ ] [ text "Course is initialized" ]
-        Nothing ->
+        _ ->
             div [ class "row" ] 
                 [ createCourseHeader
                 , createCourseForm model
@@ -125,12 +133,13 @@ createCourseForm model =
         [ formErrors model
         , courseName model
         , addHoleForm model
+        , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
         , showHoles model 
         ]
 
 formErrors : Model -> Html Msg
 formErrors model =
-    case model.parError of
+    case model.error of
         Just err
             -> div [class "alert alert-danger" ] 
                    [ 

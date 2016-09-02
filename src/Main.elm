@@ -72,6 +72,7 @@ initModel =
         gameView = True,
         players = [
             Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
+            ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
         ]
     }
 
@@ -188,10 +189,33 @@ renderPlayer : List Hole -> Player -> Html Msg
 renderPlayer holes player =
     ( (playerNameCell player) :: (scores player holes) ) 
     |> List.reverse 
-    |> (\lst -> (td [] [ text "0" ]) :: lst)
+    |> (\lst -> (td [] [ text <| toString <| calculateTotal player holes ]) :: lst)
     |> List.reverse 
     |> tr []   
      
+calculateTotal : Player -> List Hole -> Int
+calculateTotal player holes =
+    let results = player.results
+    in 
+        calculateTotalsRec 0 results holes
+
+
+calculateTotalsRec acc results holes =
+        case results of
+            head::rest
+                -> calculateTotalsRec (acc + (calculateScoreForThrow head holes ) ) (rest) holes 
+            [] 
+                -> acc
+
+calculateScoreForThrow throwRes holes =
+    let hole = List.head (List.filter (\h -> throwRes.holeId == h.order) holes)
+    in
+        case hole of
+            Just v
+                -> throwRes.throws - v.par
+            _ 
+                -> 0
+
 playerNameCell : Player -> Html Msg
 playerNameCell player =
     td [] [text player.name]
@@ -206,7 +230,7 @@ scoreCell player hole =
     in 
         case throwResult of
             Just x
-                -> td [] [ text (toString x.throws) ]
+                -> td [] [ text (toString (x.throws - hole.par)) ]
             Nothing 
                 -> td [] [text "-"] 
     

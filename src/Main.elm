@@ -199,7 +199,7 @@ calculateTotal player holes =
     in 
         calculateTotalsRec 0 results holes
 
-
+calculateTotalsRec : Int -> List ThrowResult -> List Hole -> Int
 calculateTotalsRec acc results holes =
         case results of
             head::rest
@@ -207,6 +207,7 @@ calculateTotalsRec acc results holes =
             [] 
                 -> acc
 
+calculateScoreForThrow : ThrowResult -> List Hole -> Int
 calculateScoreForThrow throwRes holes =
     let hole = List.head (List.filter (\h -> throwRes.holeId == h.order) holes)
     in

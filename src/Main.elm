@@ -21,7 +21,8 @@ type alias Model =
        error : Maybe String,
        gameView : Bool,
        players : List Player,
-       scoreToEdit : Maybe (Player, Hole)
+       scoreToEdit : Maybe (Player, Hole),
+       newScoreValue : String
     }
 
 type alias ThrowResult = 
@@ -75,7 +76,8 @@ initModel =
             Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
             ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
         ],
-        scoreToEdit = Nothing
+        scoreToEdit = Nothing,
+        newScoreValue = ""
     }
 
 {- 
@@ -87,6 +89,8 @@ type Msg =
     | InputCourseName String
     | CreateCourse
     | ToggleEdit Player Hole
+    | SaveScore
+    | InputScoreToEdit String
 
 update : Msg -> Model -> Model
 update msg model =
@@ -104,17 +108,48 @@ update msg model =
                     { model | error = Just "Course must have a name and at least one hole!" }
         ToggleEdit player hole
             -> handleToggleEdit model player hole
+        InputScoreToEdit input 
+            -> { model | newScoreValue = input }
+        SaveScore 
+            -> if model.newScoreValue == "" || model.newScoreValue == "-" then
+                    { model | scoreToEdit = Nothing, error = Nothing }
+               else 
+                    case String.toInt model.newScoreValue of
+                        Ok val -> 
+                            if val > 0 then 
+                                { model | 
+                                  newScoreValue = ""
+                                  , scoreToEdit = Nothing
+                                  , players = updatePlayerScore model val  
+                                } 
+                            else 
+                                { model | error = Just "Score must be greater than zero" }
+                        Err _ 
+                        -> { model | error = Just "Score must be a number greater than zero" }
+
+updatePlayerScore : Model -> Int -> List Player 
+updatePlayerScore model val =
+    case model.scoreToEdit of 
+        Just (player, hole)
+            -> let throwResults = List.filter (\throwResult -> throwResult.holeId /= hole.order) player.results
+               in 
+                 let newPlayer = { player | results = (ThrowResult hole.order val)::throwResults }
+                     oldPlayers = List.filter (\p -> p.id /= player.id) model.players
+                 in 
+                     newPlayer::oldPlayers  
+        _           
+         -> model.players
                     
 handleToggleEdit : Model -> Player -> Hole -> Model
 handleToggleEdit model player hole =
     case model.scoreToEdit of
         Nothing 
-            -> { model | scoreToEdit = Just (player, hole) }
+            -> { model | scoreToEdit = Just (player, hole), error = Nothing }
         Just (oldPlayer, oldHole)
             -> if (oldPlayer == player && oldHole == hole) then 
-                { model | scoreToEdit = Nothing }
+                { model | scoreToEdit = Nothing, error = Nothing }
                else 
-                { model | scoreToEdit = Just (player, hole) }
+                { model | scoreToEdit = Just (player, hole), error = Nothing }
 
 updateParHolesToAdd : Model -> Model
 updateParHolesToAdd model =
@@ -156,6 +191,8 @@ renderScorecard model =
         True -> 
             div [] 
                 [ div [ class "row" ] [h3 [] [ text ("Course: " ++ model.nameCandidate) ]]
+                , formErrors model
+                , renderScoreEditForm model
                 , table [ class "table table-bordered" ] 
                         [ renderTableHeader model
                         , renderTableBody model
@@ -170,6 +207,36 @@ renderScorecard model =
 {-
     Game view
 -}
+
+renderScoreEditForm : Model -> Html Msg
+renderScoreEditForm model = 
+    case model.scoreToEdit of
+        Nothing 
+            -> div [] []
+        Just (player, hole)
+            ->  div [ class "row" ] 
+                    [ h4 [] [ text "Edit score" ]
+                    , Html.form [ class "form-inline", onSubmit SaveScore ] 
+                        [ div [ class "form-group" ] 
+                              [ label [ class "col-xs-4" ] [ text player.name ] 
+                              , input [ class "col-xs-2", onInput InputScoreToEdit, type' "text", placeholder (scoreForHole hole player)] [  ]
+                              , button [ type' "submit"] [ text "Save score"]
+                              ]
+                        ]
+                    ]
+
+scoreForHole : Hole -> Player -> String
+scoreForHole hole player = 
+    let res = List.filter (\r -> r.holeId == hole.order) player.results 
+    in  
+        case res of
+            x::xs 
+                -> 
+                   toString x.throws
+            _ 
+                -> 
+                    "-" 
+
 
 renderTableHeader : Model -> Html Msg
 renderTableHeader model =

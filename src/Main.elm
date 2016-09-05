@@ -20,7 +20,8 @@ type alias Model =
        parForHole : String,
        error : Maybe String,
        gameView : Bool,
-       players : List Player
+       players : List Player,
+       scoreToEdit : Maybe (Player, Hole)
     }
 
 type alias ThrowResult = 
@@ -73,7 +74,8 @@ initModel =
         players = [
             Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
             ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
-        ]
+        ],
+        scoreToEdit = Nothing
     }
 
 {- 
@@ -84,6 +86,7 @@ type Msg =
     | InputPar String
     | InputCourseName String
     | CreateCourse
+    | ToggleEdit Player Hole
 
 update : Msg -> Model -> Model
 update msg model =
@@ -99,6 +102,19 @@ update msg model =
                     { model | gameView = True, error = Nothing, holes = List.sortBy .order model.holes  }
                 else 
                     { model | error = Just "Course must have a name and at least one hole!" }
+        ToggleEdit player hole
+            -> handleToggleEdit model player hole
+                    
+handleToggleEdit : Model -> Player -> Hole -> Model
+handleToggleEdit model player hole =
+    case model.scoreToEdit of
+        Nothing 
+            -> { model | scoreToEdit = Just (player, hole) }
+        Just (oldPlayer, oldHole)
+            -> if (oldPlayer == player && oldHole == hole) then 
+                { model | scoreToEdit = Nothing }
+               else 
+                { model | scoreToEdit = Just (player, hole) }
 
 updateParHolesToAdd : Model -> Model
 updateParHolesToAdd model =
@@ -231,9 +247,9 @@ scoreCell player hole =
     in 
         case throwResult of
             Just x
-                -> td [] [ text (toString (x.throws - hole.par)) ]
+                -> td [ onClick (ToggleEdit player hole)] [ text (toString (x.throws - hole.par)) ]
             Nothing 
-                -> td [] [text "-"] 
+                -> td [ onClick (ToggleEdit player hole) ] [text "-"] 
     
 
 {-

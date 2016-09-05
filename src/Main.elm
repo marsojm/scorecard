@@ -203,16 +203,17 @@ renderScorecard : Model -> Html Msg
 renderScorecard model =
     case model.gameView of
         True -> 
-            div [] 
-                [ div [ class "row" ] []
-                , formErrors model
-                , renderScoreEditForm model
-                , table [ class "table table-bordered" ] 
-                        [ renderTableHeader model
-                        , renderTableBody model
-                        ]
-                , renderPlayerForm model
-                ]
+                div [ class "row" ] 
+                    [
+                    formErrors model
+                    , renderScoreEditForm model
+                    , table [ class "table table-bordered" ] 
+                            [ renderTableHeader model
+                            , renderTableBody model
+                            ]
+                    , renderPlayerForm model
+                    ]
+                
         _ ->
             div [ class "row" ] 
                 [ createCourseHeader model
@@ -362,13 +363,19 @@ scoreCell player hole =
 createCourseHeader : Model -> Html Msg
 createCourseHeader model =
     if model.gameView then 
-        div [] [ h2 [ class "pull-left" ] [text "Scorecard"]
-               , h4 [ class "pull-right"] [ text ("Course: " ++ model.nameCandidate) ]
+        div [ class "panel panel-default" ] 
+            [ div [ class "panel-heading" ] 
+                [ h2 [ class "panen-title" ] [text "Scorecard"]
+               ,  h4 [ class "panel-title"] [ text ("Course: " ++ model.nameCandidate) ]
                ]
+            ] 
     else
-        div [] [ h2 [ class "pull-left" ] [text "Scorecard"]
-               , h3 [ class "pull-right"] [ text "Create a course" ]
-               ] 
+        div [ class "panel panel-default" ] 
+            [ div [ class "panel-heading" ] 
+                [ h2 [ class "panen-title" ] [text "Scorecard"]
+               ,  h4 [ class "panel-title"] [ text "Create a course" ]
+               ]
+            ] 
         
 
 createCourseForm : Model -> Html Msg

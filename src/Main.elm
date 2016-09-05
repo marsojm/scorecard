@@ -177,7 +177,7 @@ view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ div [class "row" ] 
-              [ h1 [] [ text "Scorecard" ] ]
+              [ createCourseHeader model ]
         , div [ class "row"] 
               [
                 renderScorecard model
@@ -190,7 +190,7 @@ renderScorecard model =
     case model.gameView of
         True -> 
             div [] 
-                [ div [ class "row" ] [h3 [] [ text ("Course: " ++ model.nameCandidate) ]]
+                [ div [ class "row" ] []
                 , formErrors model
                 , renderScoreEditForm model
                 , table [ class "table table-bordered" ] 
@@ -200,7 +200,7 @@ renderScorecard model =
                 ]
         _ ->
             div [ class "row" ] 
-                [ createCourseHeader
+                [ createCourseHeader model
                 , createCourseForm model
                 ]
 
@@ -327,9 +327,17 @@ scoreCell player hole =
 {-
     Create course view
 -}
-createCourseHeader : Html Msg
-createCourseHeader = 
-    h2 [] [text "Create a course"]
+createCourseHeader : Model -> Html Msg
+createCourseHeader model =
+    if model.gameView then 
+        div [] [ h2 [ class "pull-left" ] [text "Scorecard"]
+               , h4 [ class "pull-right"] [ text ("Course: " ++ model.nameCandidate) ]
+               ]
+    else
+        div [] [ h2 [ class "pull-left" ] [text "Scorecard"]
+               , h3 [ class "pull-right"] [ text "Create a course" ]
+               ] 
+        
 
 createCourseForm : Model -> Html Msg
 createCourseForm model =

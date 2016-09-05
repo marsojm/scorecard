@@ -215,14 +215,19 @@ renderScoreEditForm model =
             -> div [] []
         Just (player, hole)
             ->  div [ class "row" ] 
-                    [ h4 [] [ text "Edit score" ]
-                    , Html.form [ class "form-inline", onSubmit SaveScore ] 
-                        [ div [ class "form-group" ] 
-                              [ label [ class "col-xs-4" ] [ text player.name ] 
-                              , input [ class "col-xs-2", onInput InputScoreToEdit, type' "text", placeholder (scoreForHole hole player)] [  ]
-                              , button [ type' "submit"] [ text "Save score"]
-                              ]
-                        ]
+                    [ div [ class "panel panel-default" ]
+                          [ div [ class "panel-heading" ] [ text "Edit throws" ]
+                          , div [ class "panel-body" ] 
+                                [
+                                    Html.form [ class "form-inline", onSubmit SaveScore ] 
+                                                [ div [ class "form-group" ] 
+                                                    [ label [ class "col-xs-4" ] [ text player.name ] 
+                                                    , input [ class "col-xs-2", onInput InputScoreToEdit, type' "text", placeholder (scoreForHole hole player)] []
+                                                    , button [ type' "submit"] [ text "Save throws"]
+                                                    ]
+                                                ]
+                                ]
+                          ] 
                     ]
 
 scoreForHole : Hole -> Player -> String

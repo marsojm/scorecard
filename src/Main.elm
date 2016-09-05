@@ -22,7 +22,8 @@ type alias Model =
        gameView : Bool,
        players : List Player,
        scoreToEdit : Maybe (Player, Hole),
-       newScoreValue : String
+       newScoreValue : String,
+       playerToAdd : String
     }
 
 type alias ThrowResult = 
@@ -77,7 +78,8 @@ initModel =
             ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
         ],
         scoreToEdit = Nothing,
-        newScoreValue = ""
+        newScoreValue = "",
+        playerToAdd = ""
     }
 
 {- 
@@ -91,6 +93,8 @@ type Msg =
     | ToggleEdit Player Hole
     | SaveScore
     | InputScoreToEdit String
+    | InputPlayerName String
+    | AddPlayer
 
 update : Msg -> Model -> Model
 update msg model =
@@ -126,6 +130,16 @@ update msg model =
                                 { model | error = Just "Score must be greater than zero" }
                         Err _ 
                         -> { model | error = Just "Score must be a number greater than zero" }
+        InputPlayerName name 
+            -> { model | playerToAdd = name }
+        AddPlayer
+            -> case String.trim model.playerToAdd of 
+                ""
+                    -> model 
+                name 
+                    -> let newId = (List.length model.players) + 1
+                       in 
+                        { model | players = (Player newId name [])::model.players, playerToAdd = "" }
 
 updatePlayerScore : Model -> Int -> List Player 
 updatePlayerScore model val =
@@ -197,6 +211,7 @@ renderScorecard model =
                         [ renderTableHeader model
                         , renderTableBody model
                         ]
+                , renderPlayerForm model
                 ]
         _ ->
             div [ class "row" ] 
@@ -207,6 +222,23 @@ renderScorecard model =
 {-
     Game view
 -}
+
+renderPlayerForm : Model -> Html Msg
+renderPlayerForm model =
+    div [ class "row" ]
+        [ div [ class "panel panel-default" ]
+              [ div [ class "panel-heading" ] [ text "Add a player" ]
+              , div [ class "panel-body" ] 
+                    [ Html.form [ class "form-inline", onSubmit AddPlayer ] 
+                                [ div [ class "form-group" ] 
+                                                    [ label [ class "col-xs-4" ] [ text "Name: " ] 
+                                                    , input [ class "col-xs-6", onInput InputPlayerName, type' "text"] []
+                                                    , button [ type' "submit"] [ text "Add"]
+                                                    ]
+                                ]
+                    ] 
+              ] 
+        ]
 
 renderScoreEditForm : Model -> Html Msg
 renderScoreEditForm model = 

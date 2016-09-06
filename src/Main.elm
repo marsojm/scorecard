@@ -373,10 +373,12 @@ createCourseForm : Model -> Html Msg
 createCourseForm model =
     Html.form [ class "form-horizontal" ]
         [ formErrors model
-        , courseName model
-        , addHoleForm model
-        , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
-        , showHoles model 
+        , div [ class "col-md-6" ] 
+              [ courseName model
+              , addHoleForm model
+              , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
+              ]
+        , div [ class "col-md-6" ] [ showHoles model ] 
         ]
 
 formErrors : Model -> Html Msg
@@ -394,7 +396,7 @@ addHoleForm : Model -> Html Msg
 addHoleForm model =
     div [ class "form-group" ] 
         [ label [ class "control-label col-sm-2" ] [ text ("Hole #" ++ (toString <| nextIdForHole model ) ++ ", Par: ") ]
-        , div [ class "col-sm-3" ] 
+        , div [ class "col-sm-5" ] 
               [ input [ type' "text", class "form-control", onInput InputPar ] [ text model.parForHole ]
               ] 
         , button [ class "btn", type' "button", onClick AddHole ] [ text "Add hole" ]
@@ -411,25 +413,31 @@ courseName : Model -> Html Msg
 courseName model =
     div [ class "form-group" ]
         [ label [ class "control-label col-sm-2" ] [ text "Name" ]
-        , div [class "col-sm-3" ] 
+        , div [class "col-sm-5" ] 
               [ input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]
               ]               
         ]
 
 showHoles : Model -> Html Msg
 showHoles model =
+    h3 [] [ text "Holes" 
+          , holeList model    
+          ]
+    
+
+holeList : Model -> Html Msg 
+holeList model =
     case List.isEmpty model.holes of 
         True -> 
             p [] [ text "No holes yet" ]
         False ->
             model.holes
             |> List.map renderHole
-            |> ul []
-            
+            |> ul [ class "list-group" ]
 
 renderHole : Hole -> Html Msg
 renderHole hole =
-    li [] [ text ("Hole #" ++ (toString hole.order ) ++ ", par " ++ (toString hole.par)) ]
+    li [ class "list-group-item" ] [ text ("#" ++ (toString hole.order ) ++ ", par " ++ (toString hole.par)) ]
 
 main : Program Never
 main =

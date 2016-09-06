@@ -72,7 +72,7 @@ initModel =
                 ],
         parForHole = parForHoleDefault,
         error = Nothing,
-        gameView = True,
+        gameView = False,
         players = [
             Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
             ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
@@ -190,8 +190,7 @@ updateParHolesToAdd model =
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
-        [ div [class "row" ] 
-              [ createCourseHeader model ]
+        [ createCourseHeader model
         , div [ class "row"] 
               [
                 renderScorecard model
@@ -216,9 +215,7 @@ renderScorecard model =
                 
         _ ->
             div [ class "row" ] 
-                [ createCourseHeader model
-                , createCourseForm model
-                ]
+                [ createCourseForm model ]
 
 {-
     Game view
@@ -363,18 +360,15 @@ scoreCell player hole =
 createCourseHeader : Model -> Html Msg
 createCourseHeader model =
     if model.gameView then 
-        div [ class "panel panel-default" ] 
-            [ div [ class "panel-heading" ] 
-                [ h2 [ class "panen-title" ] [text "Scorecard"]
-               ,  h4 [ class "panel-title"] [ text ("Course: " ++ model.nameCandidate) ]
-               ]
-            ] 
+        div [ class "page-header" ] 
+            [ h1 [] [ text "Scorecard" ]
+            , p [ class "lead"] [ text ("Course: " ++ model.nameCandidate) ]
+            ]
+             
     else
-        div [ class "panel panel-default" ] 
-            [ div [ class "panel-heading" ] 
-                [ h2 [ class "panen-title" ] [text "Scorecard"]
-               ,  h4 [ class "panel-title"] [ text "Create a course" ]
-               ]
+        div [ class "page-header" ] 
+            [ h1 [] [ text "Scorecard" ]
+            , p [ class "lead"] [ text "Create a course" ]
             ] 
         
 

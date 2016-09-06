@@ -191,10 +191,7 @@ view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ createCourseHeader model
-        , div [ class "row"] 
-              [
-                renderScorecard model
-              ]
+        , renderScorecard model   
         , p [] [ text (toString model)] -- for dev purposes
         ]
 

@@ -371,14 +371,16 @@ createCourseHeader model =
 
 createCourseForm : Model -> Html Msg
 createCourseForm model =
-    Html.form [ class "form-horizontal" ]
+    Html.form [ class "form-inline" ]
         [ formErrors model
         , div [ class "col-md-6" ] 
-              [ courseName model
-              , addHoleForm model
+              [ courseName model 
               , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
               ]
-        , div [ class "col-md-6" ] [ showHoles model ] 
+        , div [ class "col-md-6" ] 
+              [ addHoleForm model
+              , showHoles model 
+              ] 
         ]
 
 formErrors : Model -> Html Msg
@@ -395,9 +397,9 @@ formErrors model =
 addHoleForm : Model -> Html Msg
 addHoleForm model =
     div [ class "form-group" ] 
-        [ label [ class "control-label col-sm-2" ] [ text ("Hole #" ++ (toString <| nextIdForHole model ) ++ ", Par: ") ]
-        , div [ class "col-sm-5" ] 
-              [ input [ type' "text", class "form-control", onInput InputPar ] [ text model.parForHole ]
+        [ div [ class "input-group" ] 
+              [ div [ class "input-group-addon"] [ text ( (toString <| nextIdForHole model ) ++ ".") ]
+              , input [ type' "text", class "form-control", onInput InputPar ] [ text model.parForHole ]
               ] 
         , button [ class "btn", type' "button", onClick AddHole ] [ text "Add hole" ]
         ]
@@ -429,7 +431,7 @@ holeList : Model -> Html Msg
 holeList model =
     case List.isEmpty model.holes of 
         True -> 
-            p [] [ text "No holes yet" ]
+            div [ class "alert alert-warning" ] [ text "No holes yet" ]
         False ->
             model.holes
             |> List.map renderHole
@@ -437,7 +439,7 @@ holeList model =
 
 renderHole : Hole -> Html Msg
 renderHole hole =
-    li [ class "list-group-item" ] [ text ("#" ++ (toString hole.order ) ++ ", par " ++ (toString hole.par)) ]
+    li [ class "list-group-item" ] [ text ((toString hole.order ) ++ ". par: " ++ (toString hole.par)) ]
 
 main : Program Never
 main =

@@ -304,12 +304,12 @@ renderTableBody model =
 renderPlayers : Model -> Html Msg
 renderPlayers model =
     model.players
-    |> List.map (\p -> renderPlayer model.holes p)
+    |> List.map (\p -> renderPlayer model.holes p model.scoreToEdit)
     |> tbody []
 
-renderPlayer : List Hole -> Player -> Html Msg
-renderPlayer holes player =
-    ( (playerNameCell player) :: (scores player holes) ) 
+renderPlayer : List Hole -> Player -> Maybe (Player, Hole) -> Html Msg
+renderPlayer holes player scoreToEdit =
+    ( (playerNameCell player) :: (scores player holes scoreToEdit) ) 
     |> List.reverse 
     |> (\lst -> (td [] [ text <| toString <| calculateTotal player holes ]) :: lst)
     |> List.reverse 
@@ -343,20 +343,32 @@ playerNameCell : Player -> Html Msg
 playerNameCell player =
     td [] [text player.name]
 
-scores : Player -> List Hole -> List (Html Msg)
-scores player holes =
-    List.map (\h -> scoreCell player h) holes
+scores : Player -> List Hole -> Maybe (Player, Hole) -> List (Html Msg)
+scores player holes scoreToEdit =
+    List.map (\h -> scoreCell player h scoreToEdit) holes
 
-scoreCell : Player -> Hole -> Html Msg
-scoreCell player hole =
+scoreCell : Player -> Hole -> Maybe (Player, Hole) -> Html Msg
+scoreCell player hole scoreToEdit =
     let throwResult = List.head (List.filter (\tr -> tr.holeId == hole.order) player.results)
+        cStyle = cellStyle player hole scoreToEdit  
     in 
         case throwResult of
             Just x
-                -> td [ onClick (ToggleEdit player hole)] [ text (toString (x.throws - hole.par)) ]
+                -> td [ class cStyle, onClick (ToggleEdit player hole)] [ text (toString (x.throws - hole.par)) ]
             Nothing 
-                -> td [ onClick (ToggleEdit player hole) ] [text "-"] 
+                -> td [ class cStyle, onClick (ToggleEdit player hole) ] [text "-"] 
     
+
+cellStyle : Player -> Hole -> Maybe (Player, Hole) -> String
+cellStyle player hole scoreToEdit =
+    case scoreToEdit of
+        Just (p,h)
+            -> if h == hole && p == player then 
+                "warning"
+               else 
+                ""
+        Nothing
+            -> ""
 
 {-
     Create course view

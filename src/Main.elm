@@ -95,6 +95,8 @@ type Msg =
     | InputScoreToEdit String
     | InputPlayerName String
     | AddPlayer
+    | DecPar Int
+    | IncPar Int
 
 update : Msg -> Model -> Model
 update msg model =
@@ -140,6 +142,24 @@ update msg model =
                     -> let newId = (List.length model.players) + 1
                        in 
                         { model | players = (Player newId name [])::model.players, playerToAdd = "" }
+        DecPar holeId 
+            -> let newHoles = List.map (\hole -> if hole.order == holeId then decrementPar hole else hole ) model.holes
+               in 
+                { model | holes = newHoles }
+        IncPar holeId 
+            ->  let newHoles = List.map (\hole -> if hole.order == holeId then incrementPar hole else hole ) model.holes
+               in 
+                { model | holes = newHoles }
+
+decrementPar : Hole -> Hole
+decrementPar hole =
+    if hole.par <= 1 then hole 
+    else 
+      { hole | par = hole.par - 1 }
+
+incrementPar : Hole -> Hole
+incrementPar hole = 
+      { hole | par = hole.par + 1 }
 
 updatePlayerScore : Model -> Int -> List Player 
 updatePlayerScore model val =
@@ -474,9 +494,9 @@ holeForm : Hole -> Html Msg
 holeForm hole =
     div [ class "row" ] 
          [ span [ class "strong col-md-1" ] [ text ((toString hole.order) ++ ".") ]
-         , button [ class "btn btn-danger col-md-1", type' "button" ] [ text "-" ]
+         , button [ class "btn btn-danger col-md-1", type' "button", onClick (DecPar hole.order) ] [ text "-" ]
          , span [ class "strong col-md-1" ] [ text (toString hole.par) ]
-         , button [ class "btn btn-success col-md-1", type' "button" ] [ text "+" ]
+         , button [ class "btn btn-success col-md-1", type' "button", onClick (IncPar hole.order) ] [ text "+" ]
          ]  
     
 

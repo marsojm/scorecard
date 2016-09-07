@@ -257,6 +257,7 @@ renderScoreEditForm model =
                                                     [ label [ class "col-xs-4" ] [ text player.name ] 
                                                     , input [ class "col-xs-2", onInput InputScoreToEdit, type' "text", placeholder (scoreForHole hole player)] []
                                                     , button [ type' "submit"] [ text "Save throws"]
+                                                    , span [ class "help-block" ] [ text "Remember, the input is the number of throws, not the actual score. The score is calculated after the number of throws is given." ]
                                                     ]
                                                 ]
                                 ]

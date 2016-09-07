@@ -193,13 +193,13 @@ updateParHolesToAdd model =
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
-        [ createCourseHeader model
+        [ headerView model
         , formErrors model
-        , renderScorecard model   
+        , mainView model   
         ]
 
-renderScorecard : Model -> Html Msg
-renderScorecard model =
+mainView : Model -> Html Msg
+mainView model =
     case model.gameView of
         True -> 
                 div [  ] 
@@ -211,7 +211,7 @@ renderScorecard model =
                 
         _ ->
             div [ class "row" ] 
-                [ createCourseForm model ]
+                [ createCourseView model ]
 
 {-
     Game view
@@ -376,8 +376,8 @@ cellStyle player hole scoreToEdit =
 {-
     Create course view
 -}
-createCourseHeader : Model -> Html Msg
-createCourseHeader model =
+headerView : Model -> Html Msg
+headerView model =
     if model.gameView then 
         div [ class "page-header" ] 
             [ h1 [] [ text "Disc Golf Scorecard" ]
@@ -391,17 +391,33 @@ createCourseHeader model =
             ] 
         
 
-createCourseForm : Model -> Html Msg
-createCourseForm model =
-    Html.form [ class "form-inline" ]
-        [ div [ class "col-md-6" ] 
-              [ courseName model 
-              , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
-              ]
+createCourseView : Model -> Html Msg
+createCourseView model =
+    div [ class "row" ] 
+        [ div [ class "col-md-3" ] [] 
         , div [ class "col-md-6" ] 
-              [ showHoles model 
-              ] 
+              [ courseName model
+              , courseButtons model
+              , showHoles model 
+              ]
+        , div [ class "col-md-3" ] [] 
         ]
+
+courseButtons : Model -> Html Msg 
+courseButtons model =
+    div [ class "row button-row" ]
+        [ addHoleForm model
+        , createCourseButton
+        , br [] []
+        ]
+
+addHoleForm : Model -> Html Msg
+addHoleForm model =
+        div [ class "col-md-6" ] [ button [ class "btn btn-info", type' "button", onClick AddHole ] [ text "Add hole" ] ]
+
+createCourseButton : Html Msg
+createCourseButton =   
+    div [ class "col-md-6" ] [ button [ type' "button", class "btn btn-success pull-right", onClick CreateCourse ] [ text "Create" ] ]
 
 formErrors : Model -> Html Msg
 formErrors model =
@@ -414,11 +430,8 @@ formErrors model =
         _ -> div [] []
     
 
-addHoleForm : Model -> Html Msg
-addHoleForm model =
-    div [ class "row" ] 
-        [ div [ class "col-md-2" ] [ button [ class "btn btn-info", type' "button", onClick AddHole ] [ text "Add hole" ] ]
-        ]
+
+        
          
 
 
@@ -429,20 +442,20 @@ nextIdForHole model =
 
 courseName : Model -> Html Msg
 courseName model =
-    div [ class "form-group" ]
-        [ label [ class "control-label col-sm-2" ] [ text "Name" ]
-        , div [class "col-sm-5" ] 
-              [ input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]
-              ]               
-        ]
+    div [ class "row" ] [
+        div [ class "form-group" ]
+            [ label [ class "control-label col-sm-2" ] [ text "Name" ]
+            , div [class "col-sm-6" ] 
+                [ input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]
+                ]               
+            ]
+        , br [] []
+    ]
+    
 
 showHoles : Model -> Html Msg
 showHoles model =
-    div [] [ 
-           addHoleForm model
-          , br [] [] 
-          , div [ class "row"] [ holeList model ]    
-          ]
+    div [ class "row" ] [ div [ class "row"] [ holeList model ] ]
     
 
 holeList : Model -> Html Msg 

@@ -396,8 +396,7 @@ createCourseForm model =
               , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
               ]
         , div [ class "col-md-6" ] 
-              [ addHoleForm model
-              , showHoles model 
+              [ showHoles model 
               ] 
         ]
 
@@ -414,12 +413,8 @@ formErrors model =
 
 addHoleForm : Model -> Html Msg
 addHoleForm model =
-    div [ class "form-group" ] 
-        [ div [ class "input-group" ] 
-              [ div [ class "input-group-addon"] [ text ( (toString <| nextIdForHole model ) ++ ".") ]
-              , input [ type' "text", class "form-control", onInput InputPar ] [ text model.parForHole ]
-              ] 
-        , button [ class "btn", type' "button", onClick AddHole ] [ text "Add hole" ]
+    div [ class "row" ] 
+        [ div [ class "col-md-2" ] [ button [ class "btn btn-info", type' "button", onClick AddHole ] [ text "Add hole" ] ]
         ]
          
 
@@ -440,8 +435,10 @@ courseName model =
 
 showHoles : Model -> Html Msg
 showHoles model =
-    h3 [] [ text "Holes" 
-          , holeList model    
+    div [] [ 
+           addHoleForm model
+          , br [] [] 
+          , div [ class "row"] [ holeList model ]    
           ]
     
 
@@ -453,11 +450,35 @@ holeList model =
         False ->
             model.holes
             |> List.map renderHole
+            |> (\lst -> listGroupHeader::lst)
             |> ul [ class "list-group" ]
+           
+
+listGroupHeader : Html Msg
+listGroupHeader =
+    li [ class "list-group-item active" ] 
+       [ div [ class "row" ] 
+             [ span [ class "strong col-md-1" ] [ text "#" ]
+             , div [ class "col-md-1" ] []
+             , span [ class "col-md-1 text-left" ] [ text "Par" ]
+             , div [ class "col-md-1" ] [] 
+             ] 
+       ]
 
 renderHole : Hole -> Html Msg
 renderHole hole =
-    li [ class "list-group-item" ] [ text ((toString hole.order ) ++ ". par: " ++ (toString hole.par)) ]
+    li [ class "list-group-item" ] 
+       [ holeForm hole ]
+
+holeForm : Hole -> Html Msg
+holeForm hole =
+    div [ class "row" ] 
+         [ span [ class "strong col-md-1" ] [ text ((toString hole.order) ++ ".") ]
+         , button [ class "btn btn-danger col-md-1", type' "button" ] [ text "-" ]
+         , span [ class "strong col-md-1" ] [ text (toString hole.par) ]
+         , button [ class "btn btn-success col-md-1", type' "button" ] [ text "+" ]
+         ]  
+    
 
 main : Program Never
 main =

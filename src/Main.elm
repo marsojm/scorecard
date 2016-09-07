@@ -379,13 +379,13 @@ createCourseHeader : Model -> Html Msg
 createCourseHeader model =
     if model.gameView then 
         div [ class "page-header" ] 
-            [ h1 [] [ text "Scorecard" ]
+            [ h1 [] [ text "Disc Golf Scorecard" ]
             , p [ class "lead"] [ text ("Course: " ++ model.nameCandidate) ]
             ]
              
     else
         div [ class "page-header" ] 
-            [ h1 [] [ text "Scorecard" ]
+            [ h1 [] [ text "Disc Golf Scorecard" ]
             , p [ class "lead"] [ text "Create a course" ]
             ] 
         

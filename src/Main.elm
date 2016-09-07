@@ -288,15 +288,15 @@ renderTableHeader model =
 renderParRow : Model -> Html Msg
 renderParRow model =
     model.holes
-    |> List.map (\h -> th [] [ text <| "Par " ++ toString h.par ] )
-    |> (\lst -> ((th [] [ text "Players" ]) :: lst) ++ [(th [] [ text "Total" ])] )
+    |> List.map (\h -> th [ class "bg-warning" ] [ text <| "Par " ++ toString h.par ] )
+    |> (\lst -> ((th [ class "bg-warning" ] [ text "Players" ]) :: lst) ++ [(th [ class "bg-warning" ] [ text "Total" ])] )
     |> tr [] 
 
 renderHoleNumbers :Model -> Html Msg
 renderHoleNumbers model = 
     model.holes
-    |> List.map (\h -> th [] [ text <| toString h.order ] )
-    |> (\lst -> ((th [] []) :: lst) ++ [(th [] [])] ) 
+    |> List.map (\h -> th [ class "bg-primary" ] [ text <| toString h.order ] )
+    |> (\lst -> ((th [ class "bg-primary" ] []) :: lst) ++ [(th [ class "bg-primary" ] [])] ) 
     |> tr []
 
 renderTableBody : Model -> Html Msg
@@ -306,6 +306,7 @@ renderTableBody model =
 renderPlayers : Model -> Html Msg
 renderPlayers model =
     model.players
+    |> List.sortBy .id
     |> List.map (\p -> renderPlayer model.holes p model.scoreToEdit)
     |> tbody []
 

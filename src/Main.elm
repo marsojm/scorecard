@@ -306,7 +306,7 @@ renderTableHeader model =
 renderParRow : Model -> Html Msg
 renderParRow model =
     model.holes
-    |> List.map (\h -> th [] [ text <| toString h.par ] )
+    |> List.map (\h -> th [] [ text <| "Par " ++ toString h.par ] )
     |> (\lst -> ((th [] [ text "Players" ]) :: lst) ++ [(th [] [ text "Total" ])] )
     |> tr [] 
 

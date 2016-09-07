@@ -50,7 +50,7 @@ type alias Hole =
         par : Int
     }
 
-{-initModel : Model
+initModel : Model
 initModel = 
     {
         course = Nothing,
@@ -58,25 +58,8 @@ initModel =
         holes = [],
         parForHole = parForHoleDefault,
         error = Nothing,
-        gameView = False
-    }
--}
-initModel : Model
-initModel = 
-    {
-        course = Nothing,
-        nameCandidate = "My Course",
-        holes = [ Hole 1 3
-                , Hole 2 3
-                , Hole 3 4
-                ],
-        parForHole = parForHoleDefault,
-        error = Nothing,
         gameView = False,
-        players = [
-            Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
-            ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
-        ],
+        players = [],
         scoreToEdit = Nothing,
         newScoreValue = "",
         playerToAdd = ""
@@ -213,7 +196,6 @@ view model =
         [ createCourseHeader model
         , formErrors model
         , renderScorecard model   
-        , p [] [ text (toString model)] -- for dev purposes
         ]
 
 renderScorecard : Model -> Html Msg

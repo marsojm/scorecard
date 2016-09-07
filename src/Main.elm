@@ -367,7 +367,7 @@ cellStyle player hole scoreToEdit =
     case scoreToEdit of
         Just (p,h)
             -> if h == hole && p == player then 
-                "warning"
+                "info"
                else 
                 ""
         Nothing

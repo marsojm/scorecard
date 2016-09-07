@@ -443,13 +443,11 @@ nextIdForHole model =
 courseName : Model -> Html Msg
 courseName model =
     div [ class "row" ] [
-        div [ class "form-group" ]
-            [ label [ class "control-label col-sm-2" ] [ text "Name" ]
-            , div [class "col-sm-6" ] 
-                [ input [ type' "text", class "form-control", onInput InputCourseName ] [ text model.nameCandidate ]
+        div [ class "form-group" ] [
+             div [] 
+                [ input [ type' "text", class "form-control", placeholder "name of the course", onInput InputCourseName ] [ text model.nameCandidate ]
                 ]               
             ]
-        , br [] []
     ]
     
 

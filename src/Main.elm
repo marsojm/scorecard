@@ -72,7 +72,7 @@ initModel =
                 ],
         parForHole = parForHoleDefault,
         error = Nothing,
-        gameView = True,
+        gameView = False,
         players = [
             Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
             ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
@@ -191,6 +191,7 @@ view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ createCourseHeader model
+        , formErrors model
         , renderScorecard model   
         , p [] [ text (toString model)] -- for dev purposes
         ]
@@ -199,9 +200,9 @@ renderScorecard : Model -> Html Msg
 renderScorecard model =
     case model.gameView of
         True -> 
-                div [ class "row" ] 
-                    [ formErrors model
-                    , renderScoreEditForm model
+                div [  ] 
+                    [ 
+                     renderScoreEditForm model
                     , gameTable model
                     , addPlayerForm model
                     ]
@@ -377,8 +378,7 @@ createCourseHeader model =
 createCourseForm : Model -> Html Msg
 createCourseForm model =
     Html.form [ class "form-inline" ]
-        [ formErrors model
-        , div [ class "col-md-6" ] 
+        [ div [ class "col-md-6" ] 
               [ courseName model 
               , button [ type' "button", class "btn btn-primary", onClick CreateCourse ] [ text "Create" ]
               ]
@@ -392,10 +392,10 @@ formErrors : Model -> Html Msg
 formErrors model =
     case model.error of
         Just err
-            -> div [class "alert alert-danger" ] 
-                   [ 
-                    p [] [ text err ]
+            -> div [ class "row"]
+                   [ div [class "alert alert-danger" ] [ p [] [ text err ] ]
                    ]
+                
         _ -> div [] []
     
 

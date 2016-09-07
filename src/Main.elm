@@ -232,7 +232,7 @@ addPlayerForm model =
                     [ Html.form [ class "form-inline", onSubmit AddPlayer ] 
                                 [ div [ class "form-group" ] 
                                                     [ label [ class "col-xs-4" ] [ text "Name: " ] 
-                                                    , input [ class "col-xs-6", onInput InputPlayerName, type' "text"] []
+                                                    , input [ class "col-xs-6", onInput InputPlayerName, type' "text", value model.playerToAdd ] []
                                                     , button [ type' "submit"] [ text "Add"]
                                                     ]
                                 ]

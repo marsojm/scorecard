@@ -72,7 +72,7 @@ initModel =
                 ],
         parForHole = parForHoleDefault,
         error = Nothing,
-        gameView = False,
+        gameView = True,
         players = [
             Player 1 "James" [ ThrowResult 1 4, ThrowResult 2 2, ThrowResult 3 4]
             ,Player 2 "Dick" [ ThrowResult 1 1, ThrowResult 2 1]
@@ -200,14 +200,10 @@ renderScorecard model =
     case model.gameView of
         True -> 
                 div [ class "row" ] 
-                    [
-                    formErrors model
+                    [ formErrors model
                     , renderScoreEditForm model
-                    , table [ class "table table-bordered" ] 
-                            [ renderTableHeader model
-                            , renderTableBody model
-                            ]
-                    , renderPlayerForm model
+                    , gameTable model
+                    , addPlayerForm model
                     ]
                 
         _ ->
@@ -218,8 +214,17 @@ renderScorecard model =
     Game view
 -}
 
-renderPlayerForm : Model -> Html Msg
-renderPlayerForm model =
+gameTable : Model -> Html Msg
+gameTable model =
+    div [ class "row" ] [
+        table [ class "table table-bordered" ] 
+            [ renderTableHeader model
+            , renderTableBody model
+            ]
+    ]
+
+addPlayerForm : Model -> Html Msg
+addPlayerForm model =
     div [ class "row" ]
         [ div [ class "panel panel-default" ]
               [ div [ class "panel-heading" ] [ text "Add a player" ]

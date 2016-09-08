@@ -314,33 +314,46 @@ renderPlayer : List Hole -> Player -> Maybe (Player, Hole) -> Html Msg
 renderPlayer holes player scoreToEdit =
     ( (playerNameCell player) :: (scores player holes scoreToEdit) ) 
     |> List.reverse 
-    |> (\lst -> (td [] [ text <| toString <| calculateTotal player holes ]) :: lst)
+    |> (\lst -> (td [] [ text <| totalScoreString <| calculateTotal player holes ]) :: lst)
     |> List.reverse 
     |> tr []   
      
-calculateTotal : Player -> List Hole -> Int
+
+totalScoreString score =
+    let (a,b) = score 
+    in 
+        (toString a) ++ " (" ++ (toStringScore b) ++ ")"
+
+calculateTotal : Player -> List Hole -> (Int,Int)
 calculateTotal player holes =
     let results = player.results
     in 
-        calculateTotalsRec 0 results holes
+        calculateTotalsRec (0,0) results holes
 
-calculateTotalsRec : Int -> List ThrowResult -> List Hole -> Int
+calculateTotalsRec : (Int,Int) -> List ThrowResult -> List Hole -> (Int,Int)
 calculateTotalsRec acc results holes =
         case results of
             head::rest
-                -> calculateTotalsRec (acc + (calculateScoreForThrow head holes ) ) (rest) holes 
+                -> calculateTotalsRec (addPair acc (calculateScoreForThrow head holes) ) (rest) holes 
             [] 
                 -> acc
 
-calculateScoreForThrow : ThrowResult -> List Hole -> Int
+addPair : (Int,Int) -> (Int,Int) -> (Int, Int)
+addPair p1 p2 =
+    let (a1,a2) = p1
+        (b1,b2) = p2
+    in 
+        (a1 + b1, a2 + b2)
+
+calculateScoreForThrow : ThrowResult -> List Hole -> (Int, Int)
 calculateScoreForThrow throwRes holes =
     let hole = List.head (List.filter (\h -> throwRes.holeId == h.order) holes)
     in
         case hole of
             Just v
-                -> throwRes.throws - v.par
+                -> (throwRes.throws, throwRes.throws - v.par)
             _ 
-                -> 0
+                -> (0,0)
 
 playerNameCell : Player -> Html Msg
 playerNameCell player =

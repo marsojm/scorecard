@@ -357,10 +357,17 @@ scoreCell player hole scoreToEdit =
     in 
         case throwResult of
             Just x
-                -> td [ class cStyle, onClick (ToggleEdit player hole)] [ text (toString (x.throws - hole.par)) ]
+                -> td [ class cStyle, onClick (ToggleEdit player hole)] 
+                      [ text ((toString x.throws) 
+                             ++ " (" ++ 
+                             (toStringScore (x.throws - hole.par) )  ++ ")") ]
             Nothing 
                 -> td [ class cStyle, onClick (ToggleEdit player hole) ] [text "-"] 
-    
+
+toStringScore : Int -> String
+toStringScore score =
+    if score >= 0 then  "+" ++ (toString score)
+    else (toString score)
 
 cellStyle : Player -> Hole -> Maybe (Player, Hole) -> String
 cellStyle player hole scoreToEdit =

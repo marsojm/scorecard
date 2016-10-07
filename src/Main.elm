@@ -15,7 +15,7 @@ parForHoleDefault = "3"
 
 type alias Model =
     {  course : Maybe Course,
-       nameCandidate : String,
+       courseName : String,
        holes : List Hole,
        parForHole : String,
        error : Maybe String,
@@ -54,7 +54,7 @@ initModel : Model
 initModel = 
     {
         course = Nothing,
-        nameCandidate = "",
+        courseName = "",
         holes = [],
         parForHole = parForHoleDefault,
         error = Nothing,
@@ -87,11 +87,11 @@ update msg model =
         AddHole
             -> updateParHolesToAdd model
         InputCourseName name
-            -> { model | nameCandidate = name }
+            -> { model | courseName = name }
         InputPar input
             -> { model | parForHole = input }
         CreateCourse
-            ->  if (String.length model.nameCandidate) > 0 && (List.length model.holes > 0) then 
+            ->  if (String.length model.courseName) > 0 && (List.length model.holes > 0) then 
                     { model | gameView = True, error = Nothing, holes = List.sortBy .order model.holes  }
                 else 
                     { model | error = Just "Course must have a name and at least one hole!" }
@@ -401,7 +401,7 @@ headerView model =
     if model.gameView then 
         div [ class "page-header" ] 
             [ h1 [] [ text "Disc Golf Scorecard" ]
-            , p [ class "lead"] [ text ("Course: " ++ model.nameCandidate) ]
+            , p [ class "lead"] [ text ("Course: " ++ model.courseName) ]
             ]
              
     else
@@ -465,7 +465,7 @@ courseName model =
     div [ class "row" ] [
         div [ class "form-group" ] [
              div [] 
-                [ input [ type' "text", class "form-control", placeholder "name of the course", onInput InputCourseName ] [ text model.nameCandidate ]
+                [ input [ type' "text", class "form-control", placeholder "name of the course", onInput InputCourseName ] [ text model.courseName ]
                 ]               
             ]
     ]
